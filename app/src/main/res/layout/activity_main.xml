@@ -17,6 +17,12 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize" />
 
+        <Button
+            android:id="@+id/btnToken"
+            android:layout_width="match_parent"
+            android:layout_height="82dp"
+            android:text="Token" />
+
     </com.google.android.material.appbar.AppBarLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
