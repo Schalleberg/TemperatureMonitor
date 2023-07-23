@@ -1,15 +1,25 @@
 package com.schalleberg.temperaturemonitor;
 
 
+import android.content.Intent;
+import android.os.Build;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.dropbox.core.DbxException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 
 public class TempMonitorFirebaseMessagingService extends FirebaseMessagingService {
@@ -57,7 +67,26 @@ public class TempMonitorFirebaseMessagingService extends FirebaseMessagingServic
         Log.d(TAG, msg);
         //Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
 
+        InputStream is = new ByteArrayInputStream(token.getBytes(StandardCharsets.UTF_8));
+        try {
+            String fileName = "/TemperatureMonitorAndroid/Devices/" + getDeviceIdentifier() + ".dat";
+            DropboxClientFactory.getClient().files().uploadBuilder(fileName).uploadAndFinish(is);
+        } catch (DbxException e) {
+            Log.d(TAG, "Exception:" + e.getLocalizedMessage());
+        } catch (IOException e) {
+            Log.d(TAG, "Exception:" + e.getLocalizedMessage());
+        }
+
     }
+
+    private static String getDeviceIdentifier()
+    {
+        String androidID = Settings.Secure.getString(MainActivity.getAppContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        String manufacturer = Build.MANUFACTURER;
+        String model = Build.MODEL;
+        return manufacturer + "_" + model + "_" + androidID;
+    }
+
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {

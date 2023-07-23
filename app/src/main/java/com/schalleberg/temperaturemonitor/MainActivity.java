@@ -1,7 +1,10 @@
 package com.schalleberg.temperaturemonitor;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
+import com.dropbox.core.android.Auth;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,10 +29,30 @@ public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
 
+    private static Context context = null;
+
+    public static Context getAppContext() {
+        if (context == null)
+        {
+            throw new RuntimeException("'context' is null (will be set in onCreate()");
+        }
+        return context;
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = getApplicationContext();
+        String accessToken = "sl.Biv7jLz9spQF4O1MFFse6K2_i7TOKblbrSgeQOyvAcWe5nN1eCplPyKCnwNw9Hm-JuLXMPhJpJ9s_ED4svNt_ZWUMniV17I-8plTqaQjlF1IYtrdjDzv4h2oQ7EsJb_6ebc_j-skTa0f";
 
+        if (accessToken == null) {
+            accessToken = Auth.getOAuth2Token();
+            if (accessToken == null) {
+                return;
+            }
+        }
+
+        //TODO: move in service
+        DropboxClientFactory.init(accessToken);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
